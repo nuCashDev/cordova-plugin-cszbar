@@ -1,0 +1,24 @@
+var argscheck = require('cordova/argscheck'),
+    exec = require('cordova/exec');
+
+function ZBar() {};
+
+ZBar.prototype = {
+
+    scan: function(params, success, failure) {
+        argscheck.checkArgs('*fF', 'CsZBar.scan', arguments);
+
+        params = params || {};
+        if (params.theme_color === undefined) params.theme_color = "#88000000";
+        if (params.text_title === undefined) params.text_title = "Scan QR Code";
+        if (params.text_instructions === undefined) params.text_instructions = "Please point your camera at the QR code.";
+        if (params.camera != "front") params.camera = "back";
+        if (params.flash != "on" && params.flash != "off") params.flash = "auto";
+        if (params.formats === undefined) params.formats = [];
+
+        exec(success, failure, 'CsZBar', 'scan', [params]);
+    },
+
+};
+
+module.exports = new ZBar;
