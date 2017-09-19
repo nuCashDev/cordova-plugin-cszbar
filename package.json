@@ -1,43 +1,42 @@
 {
-  "name": "cordova-plugin-cszbar",
-  "version": "1.3.6",
-  "description": "Plugin to integrate with the ZBar barcode scanning library. nuCash version",
-  "cordova": {
-    "id": "cordova-plugin-cszbar",
-    "platforms": [
-      "android",
-      "ios"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@10.100.1.125:nucash/plugins.git"
-  },
-  "keywords": [
-    "cszbar",
-    "zbar",
-    "barcode",
-    "qr",
-    "qr code",
-    "scanner",
-    "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios"
-  ],
-  "engines": [
-    {
-      "name": "cordova-android",
-      "version": ">=3.0.0"
+    "name": "cordova-plugin-cszbar-nucash",
+    "version": "1.3.6",
+    "description": "Plugin to integrate with the ZBar barcode scanning library. nuCash version",
+    "cordova": {
+        "id": "cordova-plugin-cszbar",
+        "platforms": [
+            "android",
+            "ios"
+        ]
     },
-    {
-      "name": "cordova-ios",
-      "version": ">=3.0.0"
-    }
-  ],
-  "author": "TJ Woon <tj@cloudsky.org> and Vlopes",
-  "license": "Apache 2.0",
-  "bugs": {
-    "url": "https://github.com/tjwoon/csZBar/issues"
-  },
-  "homepage": "https://github.com/tjwoon/csZBar#readme"
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/nuCashDev/cordova-plugin-cszbar.git"
+    },
+    "keywords": [
+        "cszbar",
+        "zbar",
+        "barcode",
+        "qr",
+        "qr code",
+        "scanner",
+        "ecosystem:cordova",
+        "cordova-android",
+        "cordova-ios"
+    ],
+    "engines": [{
+            "name": "cordova-android",
+            "version": ">=3.0.0"
+        },
+        {
+            "name": "cordova-ios",
+            "version": ">=3.0.0"
+        }
+    ],
+    "author": "Eduardo Vieira - nuCash",
+    "license": "Apache 2.0",
+    "bugs": {
+        "url": "https://github.com/nuCashDev/cordova-plugin-cszbar/issues"
+    },
+    "homepage": "https://github.com/nuCashDev/cordova-plugin-cszbar#readme"
 }
