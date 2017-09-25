@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.hardware.Camera;
@@ -51,7 +52,7 @@ implements SurfaceHolder.Callback {
 
     // Config ----------------------------------------------------------
 
-    private static int autoFocusInterval = 2000; // Interval between AFcallback and next AF attempt.
+    private static int autoFocusInterval = 1000; // Interval between AFcallback and next AF attempt.
 
     // Public Constants ------------------------------------------------
 
@@ -67,6 +68,7 @@ implements SurfaceHolder.Callback {
     private SurfaceHolder holder;
     private ImageScanner scanner;
     private int surfW, surfH;
+    JSONArray formats = new JSONArray();
     MediaPlayer mplayer;
 
     // Customisable stuff
@@ -105,6 +107,11 @@ implements SurfaceHolder.Callback {
                     CAMERA_PERMISSION_REQUEST);
         }
         mplayer = MediaPlayer.create(this, getResourceId("raw/beep3_double"));
+        if(formats.toString().contains("QRCODE")) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }else{
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
         super.onCreate(savedInstanceState);
 
 
@@ -146,7 +153,7 @@ implements SurfaceHolder.Callback {
             flashMode = params.optString("flash");
 
             //new parameter formats - list of formats to scan
-            JSONArray formats = params.optJSONArray("formats");
+            formats = params.optJSONArray("formats");
 
             // Initiate instance variables
             autoFocusHandler = new Handler();
@@ -294,7 +301,8 @@ implements SurfaceHolder.Callback {
         } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
-        camera.setDisplayOrientation(result);
+            camera.setDisplayOrientation(result);
+
     }
     @Override
     public void onPause ()
@@ -345,10 +353,11 @@ implements SurfaceHolder.Callback {
         surfW = w;
         surfH = h;
         //matchSurfaceToPreviewRatio();
-
-        tryStopPreview();
-        holder = hld;
-        tryStartPreview();
+if(camera!=null) {
+    tryStopPreview();
+    holder = hld;
+    tryStartPreview();
+}
     }
     public void onConfigurationChanged(Configuration newConfig)
     {
@@ -549,6 +558,8 @@ implements SurfaceHolder.Callback {
         if(holder != null) {
             try {
                 int rotation = getWindowManager().getDefaultDisplay().getRotation();
+
+
                 switch(rotation)
                 {
                 case 0: // '\0'
@@ -572,7 +583,7 @@ implements SurfaceHolder.Callback {
                     break;
                 }
                 // 90 degrees rotation for Portrait orientation Activity.
-               // camera.setDisplayOrientation(rotation);
+               //camera.setDisplayOrientation(rotation);
                 setCameraDisplayOrientation(this, 0);
 
                 android.hardware.Camera.Parameters camParams = camera.getParameters();

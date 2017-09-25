@@ -2,7 +2,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import "AlmaZBarReaderViewController.h"
 #import <AudioToolbox/AudioToolbox.h>
-#import <QuartzCore/QuartzCore.h>
 
 #pragma mark - State
 
@@ -27,6 +26,14 @@
     self.scanInProgress = NO;
 }
 
+- (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    return;
+}
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+    return YES;
+}
+
 #pragma mark - Plugin API
 
 - (void)scan: (CDVInvokedUrlCommand*)command;
@@ -41,9 +48,10 @@
         self.scanInProgress = YES;
         self.scanCallbackId = [command callbackId];
         self.scanReader = [AlmaZBarReaderViewController new];
+	self.scanReader.videoQuality = UIImagePickerControllerQualityTypeHigh;
         
         self.scanReader.readerDelegate = self;
-        self.scanReader.videoQuality = UIImagePickerControllerQualityTypeHigh;
+        self.scanReader.supportedOrientationsMask = ZBarOrientationMask(UIInterfaceOrientationPortrait);
         
         // Get user parameters
         NSDictionary *params = (NSDictionary*) [command argumentAtIndex:0];
@@ -65,6 +73,16 @@
             self.scanReader.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
         }
         
+        // Hack to hide the bottom bar's Info button... originally based on http://stackoverflow.com/a/16353530
+        NSInteger infoButtonIndex;
+        if ([[[UIDevice currentDevice] systemVersion] compare:@"10.0" options:NSNumericSearch] != NSOrderedAscending) {
+            infoButtonIndex = 1;
+        } else {
+            infoButtonIndex = 3;
+        }
+        UIView *infoButton = [[[[[self.scanReader.view.subviews objectAtIndex:2] subviews] objectAtIndex:0] subviews] objectAtIndex:infoButtonIndex];
+        [infoButton setHidden:YES];
+        
         //UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem]; [button setTitle:@"Press Me" forState:UIControlStateNormal]; [button sizeToFit]; [self.view addSubview:button];
         CGRect screenRect = [[UIScreen mainScreen] bounds];
         CGFloat screenWidth = screenRect.size.width;
@@ -73,44 +91,43 @@
         BOOL drawSight = [params objectForKey:@"drawSight"] ? [[params objectForKey:@"drawSight"] boolValue] : true;
         UIToolbar *toolbarViewFlash = [[UIToolbar alloc] init];
         
-        BOOL drawQRCode = [params objectForKey:@"drawQRCode"] ? [[params objectForKey:@"drawQRCode"] boolValue] : true;
-        
-        if(drawQRCode)
-        {
-            self.scanReader.supportedOrientationsMask = (UIInterfaceOrientationPortrait);
-            [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationPortrait) forKey:@"orientation"];
-            NSLog(@"Portrait");
-            //Imagem logo
-            UIImage *image = [UIImage imageNamed:@"logo"];
-            UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
-            imageView.frame = CGRectMake(self.viewController.view.bounds.size.width/2-image.size.width/4, image.size.height/2, image.size.width/2, image.size.height/2);
-            //        self.scanReader.cameraOverlayView = imageView;
-            [scanReader.view insertSubview:imageView aboveSubview:scanReader.view];
-            [scanReader.view bringSubviewToFront:imageView];
-            
-            
-            UIImage *imageGuia = [UIImage imageNamed:@"guia-qrcode"];
-            UIImageView *imageViewGuia = [[UIImageView alloc] initWithImage:imageGuia];
-            imageViewGuia.frame = CGRectMake(self.viewController.view.bounds.size.width/2-imageGuia.size.width/4, imageGuia.size.height/2, imageGuia.size.height/1.4, imageGuia.size.width/1.4);
-            imageViewGuia.center = self.viewController.view.center;
-            [scanReader.view insertSubview:imageViewGuia aboveSubview:scanReader.view];
-            [scanReader.view bringSubviewToFront:imageViewGuia];
-        }
-        else
-        {
-            NSLog(@"Deitado");
-            [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationLandscapeRight) forKey:@"orientation"];
-            self.scanReader.supportedOrientationsMask = (UIInterfaceOrientationLandscapeLeft | UIInterfaceOrientationLandscapeRight);
-//            [self drawLine];
-        }
         //The bar length it depends on the orientation
         toolbarViewFlash.frame = CGRectMake(0.0, 0, (screenWidth > screenHeight ?screenWidth:screenHeight), 44.0);
         toolbarViewFlash.barStyle = UIBarStyleBlackOpaque;
         UIBarButtonItem *buttonFlash = [[UIBarButtonItem alloc] initWithTitle:@"Flash" style:UIBarButtonItemStyleDone target:self action:@selector(toggleflash)];
         
+//        //botão comanda
+//
+//        UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithTitle:@"                                     " style:UIBarButtonItemStyleDone target:self action:@selector(toggleflash)];
+//        UIBarButtonItem *btnComanda = [[UIBarButtonItem alloc] initWithTitle:@"Mesa-Comanda" style:UIBarButtonItemStyleDone target:self action:@selector(viewNumero)];
+        
         NSArray *buttons = [NSArray arrayWithObjects: buttonFlash, nil];
         [toolbarViewFlash setItems:buttons animated:NO];
         [self.scanReader.view addSubview:toolbarViewFlash];
+        
+        //Imagem logo
+        UIImage *image = [UIImage imageNamed:@"logo"];
+        UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
+        imageView.frame = CGRectMake(self.viewController.view.bounds.size.width/2-image.size.width/4, image.size.height/2, image.size.width/2, image.size.height/2);
+        self.scanReader.cameraOverlayView = imageView;
+        
+        UIImage *imageGuia = [UIImage imageNamed:@"guia-qrcode"];
+        UIImageView *imageViewGuia = [[UIImageView alloc] initWithImage:imageGuia];
+        imageViewGuia.frame = CGRectMake(self.viewController.view.bounds.size.width/2-imageGuia.size.width/4, imageGuia.size.height/2, imageGuia.size.height/1.4, imageGuia.size.width/1.4);
+        imageViewGuia.center = self.viewController.view.center;
+        [scanReader.view insertSubview:imageViewGuia aboveSubview:scanReader.view];
+        [scanReader.view bringSubviewToFront:imageViewGuia];
+        
+        if (drawSight) {
+            CGFloat dim = screenWidth < screenHeight ? screenWidth / 1.1 : screenHeight / 1.1;
+            UIView *polygonView = [[UIView alloc] initWithFrame: CGRectMake  ( (screenWidth/2) - (dim/2), (screenHeight/2) - (dim/2), dim, dim)];
+            
+            UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(0,dim / 2, dim, 1)];
+            lineView.backgroundColor = [UIColor redColor];
+            [polygonView addSubview:lineView];
+            
+            self.scanReader.cameraOverlayView = polygonView;
+        }
         
         [self.viewController presentViewController:self.scanReader animated:YES completion:nil];
     }
@@ -143,57 +160,20 @@
     [device unlockForConfiguration];
 }
 
--(void)viewTampaBotao {
-    
-    CGPoint point;
-    point.x = self.viewController.view.bounds.size.width-10;
-    point.y = self.viewController.view.bounds.size.height-10;
-    
-    unsigned char pixel[4] = {0};
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    CGContextRef context = CGBitmapContextCreate(pixel, 1, 1, 8, 4, colorSpace, kCGBitmapAlphaInfoMask & kCGImageAlphaPremultipliedLast);
-    
-    CGContextTranslateCTM(context, -point.x, -point.y);
-    
-    [self.viewController.view.layer renderInContext:context];
-    
-    CGContextRelease(context);
-    CGColorSpaceRelease(colorSpace);
-    
-    //NSLog(@"pixel: %d %d %d %d", pixel[0], pixel[1], pixel[2], pixel[3]);
-    
-    UIColor *color = [UIColor colorWithRed:pixel[0]/255.0 green:pixel[1]/255.0 blue:pixel[2]/255.0 alpha:pixel[3]/255.0];
-    
-    UIView *viewTampa = [[UIView alloc] initWithFrame:CGRectMake(self.viewController.view.bounds.size.width-150, self.viewController.view.bounds.size.height-65, 65, 65)];
-    viewTampa.backgroundColor = color;  //[UIColor colorWithRed:97/255.0 green:97/255.0 blue:97/255.0 alpha:1];
-    viewTampa.layer.zPosition = MAXFLOAT;
-    viewTampa.userInteractionEnabled = NO;
-    [self.scanReader.view addSubview:viewTampa];
-//    [scanReader.view bringSubviewToFront:viewTampa];
-    
-//        UITextField *txtNumero = [[UITextField alloc] initWithFrame:CGRectMake(35, 75, 200, 40)];
-//        txtNumero.textColor = [UIColor colorWithRed:0/256.0 green:84/256.0 blue:129/256.0 alpha:1.0];
-//        txtNumero.font = [UIFont fontWithName:@"Helvetica-Bold" size:25];
-//        txtNumero.backgroundColor=[UIColor lightGrayColor];
-//        txtNumero.text=@"";
-//
-//        [viewNumero addSubview:txtNumero];
-	[viewTampa bringSubviewToFront:viewTampa];
-}
-
--(void)drawLine {
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    CGFloat screenWidth = screenRect.size.width;
-    CGFloat screenHeight = screenRect.size.height;
-    
-    UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(50,screenHeight/2, screenWidth-50, 1)];
-    lineView.backgroundColor = [UIColor redColor];
-    
-//    self.scanReader.cameraOverlayView = polygonView;
-    [self.scanReader.view addSubview:lineView];
+-(void)viewNumero {
+    //    UIView *viewNumero = [[UIView alloc] initWithFrame:CGRectMake(self.viewController.view.bounds.size.width/5, self.viewController.view.bounds.size.height/3, self.viewController.view.bounds.size.width/1.50, self.viewController.view.bounds.size.height/3)];
+    //    viewNumero.backgroundColor = [UIColor whiteColor];
+    //    [self.scanReader.view addSubview:viewNumero];
+    //    [scanReader.view bringSubviewToFront:viewNumero];
+    //
+    //    UITextField *txtNumero = [[UITextField alloc] initWithFrame:CGRectMake(35, 75, 200, 40)];
+    //    txtNumero.textColor = [UIColor colorWithRed:0/256.0 green:84/256.0 blue:129/256.0 alpha:1.0];
+    //    txtNumero.font = [UIFont fontWithName:@"Helvetica-Bold" size:25];
+    //    txtNumero.backgroundColor=[UIColor lightGrayColor];
+    //    txtNumero.text=@"";
+    //
+    //    [viewNumero addSubview:txtNumero];
+    //    [viewNumero bringSubviewToFront:viewNumero];
 }
 
 #pragma mark - Helpers
@@ -215,7 +195,7 @@
     ZBarSymbol *symbol = nil;
     for (symbol in results) break; // get the first result
     
-    if(true)
+    if([symbol.typeName  isEqual: @"QR-Code"])
     {
         NSString *soundPath = [[NSBundle mainBundle] pathForResource:@"double_beep" ofType:@"mp3"];
         SystemSoundID soundID;
@@ -227,7 +207,7 @@
             [self sendScanResult: [CDVPluginResult
                                    resultWithStatus: CDVCommandStatus_OK
                                    messageAsString: symbol.data]];
-            NSLog(@"%@", symbol.data);
+            NSLog(@"%@", symbol.typeName);
         }];
         
         if ([self.scanReader isBeingDismissed]) {
@@ -244,10 +224,6 @@
         [self sendScanResult: [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_ERROR
                                messageAsString: @"cancelled"]];
-        
-        self.scanReader.supportedOrientationsMask = UIInterfaceOrientationPortrait;
-        [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationPortrait) forKey:@"orientation"];
-        
     }];
 }
 
@@ -257,10 +233,6 @@
         [self sendScanResult: [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_ERROR
                                messageAsString: @"Failed"]];
-        
-        self.scanReader.supportedOrientationsMask = UIInterfaceOrientationPortrait;
-        [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationPortrait) forKey:@"orientation"];
-        
     }];
 }
 
