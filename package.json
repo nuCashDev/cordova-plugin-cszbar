@@ -1,5 +1,5 @@
 {
-  "name": "cordova-plugin-cszbar",
+  "name": "cordova-plugin-cszbar-nucash",
   "version": "1.3.9",
   "description": "Plugin to integrate with the ZBar barcode scanning library.",
   "cordova": {
