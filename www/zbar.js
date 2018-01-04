@@ -15,6 +15,7 @@ ZBar.prototype = {
         if (params.camera != "front") params.camera = "back";
         if (params.flash != "on" && params.flash != "off") params.flash = "auto";
         if (params.formats === undefined) params.formats = [];
+		if (params.layout_type === undefined) params.layout_type="";
 
         exec(success, failure, 'CsZBar', 'scan', [params]);
     },

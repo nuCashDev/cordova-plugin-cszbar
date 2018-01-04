@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
-            android:src="@drawable/leitor_qrcode" />
+            android:src="@drawable/saque_ler_qrcode" />
 
         <View android:id="@+id/csZbarScannerSight"
             android:layout_width="match_parent"

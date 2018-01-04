@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-cszbar" version="1.3.6">
+        id="cordova-plugin-cszbar-nucash" version="1.3.6">
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -45,6 +45,8 @@
         </config-file>
         <framework src="com.android.support:support-v4:23.1.0" />
         <resource-file src="android/res/layout/cszbarscanner.xml" target="res/layout/cszbarscanner.xml" />
+        <resource-file src="android/res/layout/cszbarscanner2.xml" target="res/layout/cszbarscanner2.xml" />
+        <resource-file src="android/res/layout/cszbarscanner3.xml" target="res/layout/cszbarscanner3.xml" />
         <resource-file src="android/res/raw/beep3_double.mp3" target="res/raw/beep3_double.mp3" />
         <source-file src="android/ZBarcodeFormat.java" target-dir="src/org/cloudsky/cordovaPlugins" />
         <source-file src="android/ZBar.java" target-dir="src/org/cloudsky/cordovaPlugins" />
@@ -76,6 +78,24 @@
         <source-file src="android/res/drawable/leitor_qrcode.png" target-dir="res/drawable-mdpi"/>
         <source-file src="android/res/drawable/leitor_qrcode.png" target-dir="res/drawable-xhdpi"/>
         <source-file src="android/res/drawable/leitor_qrcode.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable-ldpi"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="android/res/drawable/venda_ler_qrcode.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable-ldpi"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="android/res/drawable/saque_ler_qrcode.png" target-dir="res/drawable-xxhdpi"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable-ldpi"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable-mdpi"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable-xhdpi"/>
+        <source-file src="android/res/drawable/nucash_corporate.png" target-dir="res/drawable-xxhdpi"/>
     </platform>
 
     <platform name="ios">
@@ -122,7 +142,11 @@
         <header-file src="ios/ZBarSDK/zbar/Window.h" />
         <resource-file src="ios/Resources/double_beep.mp3"/>
         <resource-file src="ios/Resources/guia-qrcode.png"/>
+        <resource-file src="ios/Resources/corner-azul.png"/>
+        <resource-file src="ios/Resources/corner-roxo.png"/>
         <resource-file src="ios/Resources/logo.png"/>
+        <resource-file src="ios/Resources/logo-azul.png"/>
+        <resource-file src="ios/Resources/logo-roxo.png"/>
         <resource-file src="ios/Resources/CsZBarScanView.xib" />
     </platform>
 

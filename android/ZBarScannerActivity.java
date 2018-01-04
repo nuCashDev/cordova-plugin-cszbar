@@ -65,6 +65,7 @@ implements SurfaceHolder.Callback {
     private Camera camera;
     private Handler autoFocusHandler;
     private SurfaceView scannerSurface;
+    private Boolean surfaceReady =false;
     private SurfaceHolder holder;
     private ImageScanner scanner;
     private int surfW, surfH;
@@ -107,11 +108,7 @@ implements SurfaceHolder.Callback {
                     CAMERA_PERMISSION_REQUEST);
         }
         mplayer = MediaPlayer.create(this, getResourceId("raw/beep3_double"));
-        if(formats.toString().contains("QRCODE")) {
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        }else{
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        }
+
         super.onCreate(savedInstanceState);
 
 
@@ -146,6 +143,7 @@ implements SurfaceHolder.Callback {
             catch (JSONException e) { params = new JSONObject(); }
             String textTitle = params.optString("text_title");
             String themeColor = params.optString("theme_color");
+			String layoutType = params.optString("layout_type");
             String textInstructions = params.optString("text_instructions");
             Boolean drawSight = params.optBoolean("drawSight", true);
             Boolean drawQRCode = params.optBoolean("drawQRCode", true);
@@ -154,7 +152,13 @@ implements SurfaceHolder.Callback {
 
             //new parameter formats - list of formats to scan
             formats = params.optJSONArray("formats");
-
+        if(formats.toString().contains("QRCODE")) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            Log.d("Sentido","retrato");
+        }else{
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            Log.d("Sentido","paisagem");
+        }
             // Initiate instance variables
             autoFocusHandler = new Handler();
             scanner = new ImageScanner();
@@ -197,9 +201,14 @@ implements SurfaceHolder.Callback {
                     scanner.setConfig(format.getId(), Config.ENABLE, 1);
                 }
             }
-
             // Set content view
-            setContentView(getResourceId("layout/cszbarscanner"));
+            if(layoutType.equals("pos")) {
+                setContentView(getResourceId("layout/cszbarscanner2"));
+            }else if(layoutType.equals("saque")){
+                setContentView(getResourceId("layout/cszbarscanner3"));
+            }else{
+                setContentView(getResourceId("layout/cszbarscanner"));
+            }
 
             // Update view with customisable strings
             TextView view_textTitle = (TextView) findViewById(getResourceId("id/csZbarScannerTitle"));
@@ -302,8 +311,10 @@ implements SurfaceHolder.Callback {
             result = (info.orientation - degrees + 360) % 360;
         }
             camera.setDisplayOrientation(result);
+        camera.getParameters().setRotation(result);
 
     }
+
     @Override
     public void onPause ()
     {
@@ -334,6 +345,7 @@ implements SurfaceHolder.Callback {
     {
         tryStopPreview();
         holder = hld;
+        surfaceReady = true;
         tryStartPreview();
     }
 
@@ -385,8 +397,10 @@ if(camera!=null) {
             rotation = 90;
             break;
         }
-        camera.setDisplayOrientation(rotation);
-        android.hardware.Camera.Parameters params = camera.getParameters();
+        if(camera!=null) {
+            camera.setDisplayOrientation(rotation);
+            android.hardware.Camera.Parameters params = camera.getParameters();
+        }
         tryStopPreview();
         tryStartPreview();
 
@@ -416,7 +430,7 @@ if(camera!=null) {
                     // well with flash setting of "on"... At least with this
                     // simple and stupid focus method, we get to turn the flash
                     // on during autofocus.
-                camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
             }
             //tryStopPreview();
             //tryStartPreview();
@@ -445,7 +459,13 @@ if(camera!=null) {
     private Runnable doAutoFocus = new Runnable()
     {
         public void run() {
-            if(camera != null) camera.autoFocus(autoFocusCb);
+            if(camera != null) {
+                try {
+                    camera.autoFocus(autoFocusCb);
+                } catch (Exception e){
+                    Log.d("AutoFocusError","Could not start camera preview: " + e.getMessage());
+                }
+            }
         }
     };
 
@@ -583,15 +603,16 @@ if(camera!=null) {
                     break;
                 }
                 // 90 degrees rotation for Portrait orientation Activity.
-               //camera.setDisplayOrientation(rotation);
+
                 setCameraDisplayOrientation(this, 0);
 
+                //camera.setDisplayOrientation(0);
                 android.hardware.Camera.Parameters camParams = camera.getParameters();
 
                 //camParams.setFlashMode(Parameters.FLASH_MODE_TORCH);
 
                 try {
-                   camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                   camParams.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
                    camera.setParameters(camParams);
                 } catch (Exception e) {
 					// TODO: don't swallow
@@ -602,6 +623,7 @@ if(camera!=null) {
                 camera.startPreview();
 
                 if (android.os.Build.VERSION.SDK_INT >= 14) {
+
                     camera.autoFocus(autoFocusCb); // We are not using any of the
                         // continuous autofocus modes as that does not seem to work
                         // well with flash setting of "on"... At least with this
@@ -614,3 +636,5 @@ if(camera!=null) {
         }
     }
 }
+
+

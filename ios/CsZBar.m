@@ -75,13 +75,38 @@
         
         BOOL drawQRCode = [params objectForKey:@"drawQRCode"] ? [[params objectForKey:@"drawQRCode"] boolValue] : true;
         
+        NSString *layout_type = [params objectForKey:@"layout_type"];
+        
+        UIImage *image = [[UIImage alloc] init];
+        UIImage *imageGuia = [[UIImage alloc] init];
+        
+        if(layout_type == nil)
+        {
+            //Client
+            image = [UIImage imageNamed:@"logo"];
+            imageGuia = [UIImage imageNamed:@"guia-qrcode"];
+        }
+        else if([layout_type isEqual: @"pos"])
+        {
+            //POS
+            image = [UIImage imageNamed:@"logo-azul"];
+            imageGuia = [UIImage imageNamed:@"corner-azul"];
+            NSLog(@"ENTROU NO POS");
+        }
+        else if([layout_type isEqual: @"saque"])
+        {
+            //Saque
+            image = [UIImage imageNamed:@"logo-roxo"];
+            imageGuia = [UIImage imageNamed:@"corner-roxo"];
+        }
+        
         if(drawQRCode)
         {
+            NSLog(@"%s", "LAYOUT_TYPE: ");
+            NSLog(@"%@", layout_type);
             self.scanReader.supportedOrientationsMask = (UIInterfaceOrientationPortrait);
             [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationPortrait) forKey:@"orientation"];
             NSLog(@"Portrait");
-            //Imagem logo
-            UIImage *image = [UIImage imageNamed:@"logo"];
             UIImageView *imageView = [[UIImageView alloc] initWithImage:image];
             imageView.frame = CGRectMake(self.viewController.view.bounds.size.width/2-image.size.width/4, image.size.height/2, image.size.width/2, image.size.height/2);
             //        self.scanReader.cameraOverlayView = imageView;
@@ -89,7 +114,6 @@
             [scanReader.view bringSubviewToFront:imageView];
             
             
-            UIImage *imageGuia = [UIImage imageNamed:@"guia-qrcode"];
             UIImageView *imageViewGuia = [[UIImageView alloc] initWithImage:imageGuia];
             imageViewGuia.frame = CGRectMake(self.viewController.view.bounds.size.width/2-imageGuia.size.width/4, imageGuia.size.height/2, imageGuia.size.height/1.4, imageGuia.size.width/1.4);
             imageViewGuia.center = self.viewController.view.center;
@@ -101,7 +125,7 @@
             NSLog(@"Deitado");
             [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationLandscapeRight) forKey:@"orientation"];
             self.scanReader.supportedOrientationsMask = (UIInterfaceOrientationLandscapeLeft | UIInterfaceOrientationLandscapeRight);
-//            [self drawLine];
+            //            [self drawLine];
         }
         //The bar length it depends on the orientation
         toolbarViewFlash.frame = CGRectMake(0.0, 0, (screenWidth > screenHeight ?screenWidth:screenHeight), 44.0);
@@ -171,16 +195,16 @@
     viewTampa.layer.zPosition = MAXFLOAT;
     viewTampa.userInteractionEnabled = NO;
     [self.scanReader.view addSubview:viewTampa];
-//    [scanReader.view bringSubviewToFront:viewTampa];
+    //    [scanReader.view bringSubviewToFront:viewTampa];
     
-//        UITextField *txtNumero = [[UITextField alloc] initWithFrame:CGRectMake(35, 75, 200, 40)];
-//        txtNumero.textColor = [UIColor colorWithRed:0/256.0 green:84/256.0 blue:129/256.0 alpha:1.0];
-//        txtNumero.font = [UIFont fontWithName:@"Helvetica-Bold" size:25];
-//        txtNumero.backgroundColor=[UIColor lightGrayColor];
-//        txtNumero.text=@"";
-//
-//        [viewNumero addSubview:txtNumero];
-	[viewTampa bringSubviewToFront:viewTampa];
+    //        UITextField *txtNumero = [[UITextField alloc] initWithFrame:CGRectMake(35, 75, 200, 40)];
+    //        txtNumero.textColor = [UIColor colorWithRed:0/256.0 green:84/256.0 blue:129/256.0 alpha:1.0];
+    //        txtNumero.font = [UIFont fontWithName:@"Helvetica-Bold" size:25];
+    //        txtNumero.backgroundColor=[UIColor lightGrayColor];
+    //        txtNumero.text=@"";
+    //
+    //        [viewNumero addSubview:txtNumero];
+    [viewTampa bringSubviewToFront:viewTampa];
 }
 
 -(void)drawLine {
@@ -192,7 +216,7 @@
     UIView *lineView = [[UIView alloc] initWithFrame:CGRectMake(50,screenHeight/2, screenWidth-50, 1)];
     lineView.backgroundColor = [UIColor redColor];
     
-//    self.scanReader.cameraOverlayView = polygonView;
+    //    self.scanReader.cameraOverlayView = polygonView;
     [self.scanReader.view addSubview:lineView];
 }
 
@@ -265,3 +289,6 @@
 }
 
 @end
+
+
+
