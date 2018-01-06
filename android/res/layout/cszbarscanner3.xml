@@ -41,17 +41,22 @@
 
         <ImageView
             android:id="@+id/csZbarScannerLogo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="150sp"
+            android:layout_height="150sp"
             android:src="@drawable/logo_nucash"
-            android:layout_marginTop="70dp"
+            android:layout_marginTop="30dp"
             android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true" />
 
         <ImageView
             android:id="@+id/csZbarScannerQRCode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="60sp"
+            android:paddingBottom="60sp"
+            android:paddingLeft="60sp"
+            android:paddingRight="60sp"
+            adjustViewBounds="true"
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:src="@drawable/saque_ler_qrcode" />
