@@ -80,11 +80,13 @@
         UIImage *image = [[UIImage alloc] init];
         UIImage *imageGuia = [[UIImage alloc] init];
         
-        //Default Client
-        image = [UIImage imageNamed:@"logo"];
-        imageGuia = [UIImage imageNamed:@"guia-qrcode"];
-        
-        if([layout_type isEqual: @"pos"])
+        if(layout_type)
+        {
+            //Client
+            image = [UIImage imageNamed:@"logo"];
+            imageGuia = [UIImage imageNamed:@"guia-qrcode"];
+        }
+        else if([layout_type isEqual: @"pos"])
         {
             //POS
             image = [UIImage imageNamed:@"logo-azul"];
